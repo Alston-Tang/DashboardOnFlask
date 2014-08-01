@@ -1,0 +1,48 @@
+{% extends 'shared/base.html' %}
+
+{% block head %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Template</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/styles.css') }}">
+    <!-- Font Awesome-->
+    <link rel="stylesheet" href="{{ url_for('static',filename='font-awesome-4.1.0/css/font-awesome.min.css') }}">
+    <!-- Custom Style-->
+    <link rel="stylesheet" href="{{ url_for('static',filename='stylesheets/custom.css') }}">
+    <!-- D3 Chart -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='stylesheets/chart.css') }}">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    {% block extra_css %}
+    {% endblock %}
+{% endblock %}
+
+{% block body %}
+    {% block nav_bar %}
+    {% endblock %}
+    {% block side_bar %}
+    {% endblock %}
+    {% block content %}
+    {% endblock %}
+
+    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/tools.js') }}"></script>
+    <!-- Flow Player -->
+    <script type="text/javascript" src="{{ url_for('static', filename='flowPlayer/flowplayer-3.2.13.min.js') }}"></script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/bootstrap.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/d3.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/chart.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/init.js') }}"></script>
+
+    {% block extra_js %}
+    {% endblock %}
+
+{% endblock %}

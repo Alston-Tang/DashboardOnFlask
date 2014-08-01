@@ -4,6 +4,7 @@
 DashBoard= {
     DrawList:[],
     TrackList:[],
+    VideoList:[],
     idPool:{},
     resId:function(id){
         if (this.idPool[id]){
@@ -32,6 +33,18 @@ DashBoard= {
         this.TrackList.push(c);
         return c;
     },
+    Video:function(dom,url,id,opt){
+        if (!dom || !id) {
+            throw "A html node and a unique id is required.";
+        }
+        if(!url){
+            throw "url is required"
+        }
+        this.resId(id);
+        var c=new DashBoard.VideoCons(dom,url,id,opt);
+        this.VideoList.push(c);
+        return c;
+    },
     init:function(){
         var sideBar = document.getElementById('side-bar');
         var rootList = document.getElementById('root-list');
@@ -44,11 +57,9 @@ DashBoard= {
                 var $subList=$(this).children('ul');
                 if ($subList.css('display')=='none'){
                     $subList.fadeIn('middle');
-                    $(this).css({'background-color':'#333333','color':'#cccccc'});
                 }
                 else{
                     $subList.fadeOut('fast');
-                    $(this).css({'background-color':'#eeeeee','color':'#222222'});
                 }
             });
             $mainList.find('.sub-list').children('li').each(function(){
@@ -58,6 +69,16 @@ DashBoard= {
             });
         }();
     }
+};
+
+DashBoard.VideoCons=function(dom,url,id,opt){
+    if(!dom||!url||!id){
+        throw "A html node and video url is required.";
+    }
+    this.dom=dom;
+    this.id=id;
+    this.url=url;
+    opt=opt?opt:{};
 };
 
 DashBoard.ChartCons=function(dom,type,id,opt){
@@ -78,6 +99,44 @@ DashBoard.ChartCons=function(dom,type,id,opt){
     //Calculate other option
     this.urlAttr=opt.url? opt.url:'chart/'+this.id;
     this.intervalAttr=opt.interval? opt.interval:3000;
+};
+
+DashBoard.TrackPicCons=function(dom,id,opt){
+    var cur=this;
+    if(!dom || !id){
+        throw "A html node and a unique id is required"
+    }
+    this.dom=dom;
+    this.id=id;
+    opt=opt?opt:{};
+
+    //Calculate other option
+    this.urlAttr=opt.url? opt.url:'chart/'+this.id;
+    this.intervalAttr=opt.interval? opt.interval:3000;
+    //Create cover SVG
+    this.svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    this.dom.offsetParent.appendChild(this.svg);
+    //Set SVG position and size
+    $(this.svg).css({'position':'absolute',
+                     'top':this.dom.offsetTop,
+                     'left':this.dom.offsetLeft,
+                     'width':this.dom.offsetWidth,
+                     'height':this.dom.offsetHeight,
+                     'z-index':$(this.dom).css('z-index')?$(this.dom).css('z-index')+1:1
+                     }).
+                attr({'viewBox':"0 0 "+this.dom.naturalWidth+" "+this.dom.naturalHeight,
+                      'width':this.dom.naturalWidth,
+                      'height':this.dom.naturalHeight
+                     });
+    //Set callback to auto change canvas size when image's size changed
+    $(window).resize(function(){
+        $(cur.svg).css({'position':'absolute',
+                        'top':cur.dom.offsetTop,
+                        'left':cur.dom.offsetLeft,
+                        'width':cur.dom.offsetWidth,
+                        'height':cur.dom.offsetHeight
+                        });
+    });
 };
 
 DashBoard.DataRange=function(begin,end,data,opt){
@@ -145,47 +204,6 @@ DashBoard.DataRange.prototye={
             this.con.splice(pos,0,{date:content});
         }
     }
-};
-
-DashBoard.TrackPicCons=function(dom,id,opt){
-    var cur=this;
-    if(!dom || !id){
-        throw "A html node and a unique id is required"
-    }
-    this.dom=dom;
-    this.id=id;
-    opt=opt?opt:{};
-    //List of elements to be drew
-    /*..........Todo:A structure to handle data sequence
-    this.list={};
-    */
-    //Calculate other option
-    this.urlAttr=opt.url? opt.url:'chart/'+this.id;
-    this.intervalAttr=opt.interval? opt.interval:3000;
-    //Create cover SVG
-    this.svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    this.dom.offsetParent.appendChild(this.svg);
-    //Set SVG position and size
-    $(this.svg).css({'position':'absolute',
-                     'top':this.dom.offsetTop,
-                     'left':this.dom.offsetLeft,
-                     'width':this.dom.offsetWidth,
-                     'height':this.dom.offsetHeight,
-                     'z-index':$(this.dom).css('z-index')?$(this.dom).css('z-index')+1:1
-                     }).
-                attr({'viewBox':"0 0 "+this.dom.naturalWidth+" "+this.dom.naturalHeight,
-                      'width':this.dom.naturalWidth,
-                      'height':this.dom.naturalHeight
-                     });
-    //Set callback to auto change canvas size when image's size changed
-    $(window).resize(function(){
-        $(cur.svg).css({'position':'absolute',
-                        'top':cur.dom.offsetTop,
-                        'left':cur.dom.offsetLeft,
-                        'width':cur.dom.offsetWidth,
-                        'height':cur.dom.offsetHeight
-                        });
-    });
 };
 DashBoard.TrackPicCons.prototype={
     point:function(top,left,opt){
@@ -346,6 +364,10 @@ DashBoard.ChartCons.prototype={
         this.urlAttr=url;
         return this;
     },
+    title:function(title){
+        $(this.titleDom).html('<h2>'+title+'</h2>');
+        return this;
+    },
     interval:function(i){
         if(!i) return this.intervalAttr;
         this.intervalAttr=i;
@@ -377,31 +399,36 @@ DashBoard.ChartCons.prototype={
     }
 };
 
-$(document).ready(function(){
-    //DashBoard.Chart(dmomonitorszzzzocument.getElementById('area'),'area','b',{margin:20}).enableUpdate();
-    //DashBoard.Chart(document.getElementById('pie'),'pie','a',{margin:10}).interval(15000).enableUpdate();
-    test=DashBoard.Track(document.getElementById('track-img'),'c').interval(150000).enableUpdate();
-
-    $f("monitor1", "static/flowPlayer/flowPlayer-3.2.13.min.js", {
-
-        clip: {
-            url: 'test',
-            live: true,
-            // configure clip to use influxis as our provider, it uses our rtmp plugin
-            provider: 'influxis'
-        },
-
-        // streaming plugins are configured under the plugins node
-        plugins: {
-
-            // here is our rtpm plugin configuration
-            influxis: {
-                url: "static/flowPlayer/flowplayer.rtmp-3.2.12-dev.swf",
-
-                // netConnectionUrl defines where the streams are found
-                netConnectionUrl: 'rtmp://10.62.98.123:1935/live'
+DashBoard.VideoCons.prototype={
+    enableUpdate:function(){
+        this.videoPlay();
+    },
+    videoPlay:function(){
+        $f($(this.dom).attr('id'), "static/flowPlayer/flowPlayer-3.2.18.swf", {
+            clip: {
+                url: this.url,
+                live: true,
+                provider: 'influxis'
+            },
+            plugins: {
+                controls: {
+                    url: 'static/flowPlayer/flowplayer.controls-3.2.16.swf'
+                },
+                influxis: {
+                    url: "static/flowPlayer/flowplayer.rtmp-3.2.12-dev.swf",
+                    netConnectionUrl: 'rtmp://10.62.98.123/live'
+                }
             }
-        }
-    });
+        });
+    }
+};
+
+$(document).ready(function(){
+    if(typeof (elements)=='function'){
+        elements();
+    }
+    else{
+        console.log('You have not defined any element on this page. Create function elements=function(){...} before document initialized');
+    }
     DashBoard.init();
 });

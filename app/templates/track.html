@@ -1,0 +1,14 @@
+{% extends 'shared/layout.html' %}
+{% block content %}
+<!-- Content Begin -->
+<div class="row" id="chart-area">
+    <div class="col-md-6">
+        <img class="" id="track-img" src="{{ url_for('static', filename='resource/night.jpg') }}">
+    </div>
+</div>
+<script>
+var elements=function(){
+    DashBoard.Track(document.getElementById('track-img'),'c').interval(999999).enableUpdate();
+}
+</script>
+{% endblock %}

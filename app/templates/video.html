@@ -1,0 +1,15 @@
+{% extends 'shared/layout.html' %}
+{% block content %}
+<!-- Content Begin -->
+    <div class="row" id="chart-area">
+        <div class="col-md-6">
+            <div id="monitor1" style="height:480px;margin:0 auto;text-align:center ">
+            </div>
+        </div>
+    </div>
+    <script>
+        var elements=function() {
+            DashBoard.Video(document.getElementById('monitor1'), 'test', 'd').enableUpdate();
+        }
+    </script>
+{% endblock %}

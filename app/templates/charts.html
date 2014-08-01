@@ -1,0 +1,24 @@
+{% extends 'shared/layout.html' %}
+{% block content %}
+<!-- Content Begin -->
+<div class="row" id="chart-area">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-4 chart" id="pie">
+                <div class="row title"></div>
+                <div class="row content"></div>
+            </div>
+            <div class="col-md-8 chart" id="area">
+                <div class="row title"></div>
+                <div class="row content"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+var elements=function(){
+    DashBoard.Chart(document.getElementById('pie'),'pie','a').title('Pie chart').interval(10000).enableUpdate();
+    DashBoard.Chart(document.getElementById('area'),'area','b').title('Area chart').interval(2000).enableUpdate();
+}
+</script>
+{% endblock %}
