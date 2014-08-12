@@ -1,0 +1,227 @@
+{% extends 'shared/management.html' %}
+{% block side_bar %}
+    <div id="side-bar">
+        <h3 style="position: absolute; left: 0; right: 0; text-align: center">Cameras</h3>
+        <ul class="main-list">
+            <li id="side-add-camera" class="ml disable-sub">
+                 <span class="ml-content">
+                     <i class="fa fa-plus" style="color:green"></i>
+                     Add a camera
+                 </span>
+                <hr class="hr-top">
+                <hr class="hr-bot">
+            </li>
+            <li id="ml1" class="ml">
+                 <span class="ml-content">
+                     <i class="fa fa-video-camera"></i>
+                     Scene 1
+                 </span>
+                <ul class="sub-list">
+                    <li><a href="{{ url_for('page',page_name='video') }}">Camera 1</a></li>
+                    <li><a>Camera 2</a></li>
+                    <li><a>Camera 3</a></li>
+                </ul>
+                <hr class="hr-top">
+                <hr class="hr-bot">
+            </li>
+            <li id="ml2" class="ml">
+                 <span class="ml-content">
+                     <i class="fa fa-video-camera"></i>
+                     Free
+                 </span>
+                <ul class="sub-list">
+                    <li><a href="{{ url_for('page',page_name='video') }}">Camera 4</a></li>
+                    <li><a>Camera 5</a></li>
+                    <li><a>Camera 6</a></li>
+                </ul>
+                <hr class="hr-top">
+                <hr class="hr-bot">
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+{% block content %}
+    <!-- Content Begin -->
+    <div id="chart-area">
+        <div id="camera-setting" class="ext-panel">
+        </div>
+        <div id="camera-area">
+            <div class="row">
+                <div class="col-md-2">
+                    <h3>Scene 1</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <hr>
+                </div>
+            </div>
+            <div class="row" id="camera-wall">
+                <div class="col-lg-2 col-sm-4 col-md-3">
+                    <div class="thumbnail">
+                        <object id="camera1">
+
+                        </object>
+                        <div class="caption">
+                            <h3>Camera 1</h3>
+                            <p>8F, Block D, Tsinghua Science Park </p>
+                            <p>
+                                <a href="#" class="btn btn-primary" role="button">Edit</a>
+                                <a href="#" class="btn btn-danger" role="button">Delete</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- blue-tmpl components for camera manage panel-->
+    {% raw %}
+    <script type="text/blueimp-tmpl" id="camera-panel">
+    <div class="thumbnail">
+        <object id="{%#o.id%}_camera"></object>
+        <div class="caption">
+            <h3>{%=o.name%}</h3>
+            <p>{%=o.description%}</p>
+            <p>
+                <a href="#" class="btn btn-primary" role="button">Edit</a>
+                <a href="#" class="btn btn-danger" role="button">Delete</a>
+            </p>
+        </div>
+    </div>
+    </script>
+    <script type="text/blueimp-tmpl" id="add-camera">
+    <div class="row">
+        <div class="col-md-4">
+            <form role="form" id="config-form">
+                <input type="hidden" name="id">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label>Camera Name</label>
+                        <input type="text" class="form-control" name="name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label>Location</label>
+                        <input type="text" class="form-control" name="location">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label>Latitude</label>
+                        <input class="form-control" name="latitude">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Longitude</label>
+                        <input class="form-control" name="longitude">
+                    </div>
+                    <div class="col-md-4">
+                        <label></label>
+                        <button class="form-control btn btn-primary" style="margin-top:4px">My position</button>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label>IP</label>
+                        <input class="form-control" name="ip" value="rtmp://10.62.98.123/live/test">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Stream Type</label>
+                        <input class="form-control" name="streamType">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Encoding Type</label>
+                        <input class="form-control" name="encodingType">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label>Resolution</label>
+                        <div class="input-group">
+                            <input class="form-control" name="width">
+                            <div class="input-group-addon">X</div>
+                            <input class="form-control" name="height">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label >Description</label>
+                        <textarea rows="3" class="form-control" name="description"></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-default" id="save-config">Save</button>
+            </form>
+        </div>
+    </div>
+    </script>
+    <script type="text/blueimp-tmpl" id="edit-camera">
+    <div class="row">
+        <div class="col-md-4">
+            <form role="form" id="config-form">
+                <input type="hidden" name="id" value="{%#o.id%}">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label>Camera Name</label>
+                        <input type="text" class="form-control" name="name" value="{%=o.name%}">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label>Location</label>
+                        <input type="text" class="form-control" name="location" value="{%=o.location%}">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label>Latitude</label>
+                        <input class="form-control" name="latitude" value="{%#o.latitude%}">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Longitude</label>
+                        <input class="form-control" name="longitude" value="{%#o.longitude%}">
+                    </div>
+                    <div class="col-md-4">
+                        <label></label>
+                        <button class="form-control btn btn-primary" style="margin-top:4px">My position</button>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-4">
+                        <label>IP</label>
+                        <input class="form-control" name="ip" value="{%#o.ip%}">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Stream Type</label>
+                        <input class="form-control" name="streamType" value="{%=o.streamType%}">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Encoding Type</label>
+                        <input class="form-control" name="encodingType" value="{%=o.encodingType%}">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label>Resolution</label>
+                        <div class="input-group">
+                            <input class="form-control" name="width" value="{%#o.resolution.width%}">
+                            <div class="input-group-addon">X</div>
+                            <input class="form-control" name="height" value="{%#o.resolution.height%}">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label >Description</label>
+                        <textarea rows="3" class="form-control" name="description">{%=o.description%}</textarea>
+                    </div>
+                </div>
+                <button class="btn btn-default" id="save-config">Save</button>
+            </form>
+        </div>
+    </div>
+    </script>
+    {% endraw %}
+{% endblock %}

@@ -1,0 +1,27 @@
+.ext-panel{
+  display: none;
+}
+
+.loading-panel{
+  top:0;
+  left: 0;
+  z-index: 9999;
+  position:fixed;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  &.hide{
+    display: none;
+  }
+  &.dis{
+    display: table;
+  }
+  >div{
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    >i{
+
+    }
+  }
+}

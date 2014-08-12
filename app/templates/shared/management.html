@@ -1,0 +1,16 @@
+{% extends 'shared/component.html' %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static',filename="stylesheets/camera.css") }}">
+{% endblock %}
+
+{% block side_bar %}
+{% endblock %}
+
+{% block content %}
+{% endblock %}
+{% block extra_js %}
+    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/manage/camera.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/manage/tmpl.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename="javascripts/manage/managePanel.js") }}"></script>
+{% endblock %}

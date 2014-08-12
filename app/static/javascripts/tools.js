@@ -39,5 +39,14 @@ var thmTools= {
         str=str.replace(/&lt;/g,'<');
         str=str.replace(/&gt;/g,'>');
         return str;
+    },
+    serializeToObj:function(ser){
+        var rtVal={};
+        for(var i=0; i<ser.length; i++){
+            if(ser[i].hasOwnProperty('name') && ser[i].hasOwnProperty('value')){
+                rtVal[ser[i].name]=ser[i].value;
+            }
+        }
+        return rtVal;
     }
 };

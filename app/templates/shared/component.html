@@ -25,13 +25,57 @@
 {% endblock %}
 
 {% block body %}
-    {% block nav_bar %}
-    {% endblock %}
+    <nav class="navbar navbar-custom" role="navigation">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header">
+                <a class="navbar-brand" href="#" id="side-bar-toggle"><i class="fa fa-bars"></i></a>
+            </div>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Dashboard</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Management <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#">Camera</a></li>
+                            <li><a href="#">Scene</a></li>
+                        </ul>
+                    </li>
+
+
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">EMC</a></li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container-fluid -->
+    </nav>
     {% block side_bar %}
     {% endblock %}
     {% block content %}
     {% endblock %}
 
+    <footer id='footer'>
+        <div class="center">
+            <ul>
+                <li>© 2014</li>
+                <li>EMC,&nbsp;&nbsp;Inc.</li>
+            </ul>
+        </div>
+        <div class="right">
+            <ul>
+                <li>Last Modified</li>
+                <li>1970</li>
+            </ul>
+        </div>
+    </footer>
+    <script type="text/javascript">
+        var resource_url={{ url_for('static', filename="")}};
+    </script>
     <script type="text/javascript" src="{{ url_for('static', filename='javascripts/jquery.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='javascripts/tools.js') }}"></script>
     <!-- Flow Player -->
@@ -40,8 +84,7 @@
     <script type="text/javascript" src="{{ url_for('static', filename='javascripts/bootstrap.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='javascripts/d3.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='javascripts/chart.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/init.js') }}"></script>
-
+    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/custom-ui.js') }}"></script>
     {% block extra_js %}
     {% endblock %}
 

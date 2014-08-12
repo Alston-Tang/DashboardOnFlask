@@ -1,6 +1,10 @@
 /**
  * Created by Tang on 2014/7/2.
  */
+if(!resource_url){
+    var resource_url='/static/';
+}
+
 DashBoard= {
     DrawList:[],
     TrackList:[],
@@ -33,41 +37,17 @@ DashBoard= {
         this.TrackList.push(c);
         return c;
     },
-    Video:function(dom,url,id,opt){
+    Video:function(dom,url,id,opt) {
         if (!dom || !id) {
             throw "A html node and a unique id is required.";
         }
-        if(!url){
+        if (!url) {
             throw "url is required"
         }
         this.resId(id);
-        var c=new DashBoard.VideoCons(dom,url,id,opt);
+        var c = new DashBoard.VideoCons(dom, url, id, opt);
         this.VideoList.push(c);
         return c;
-    },
-    init:function(){
-        var sideBar = document.getElementById('side-bar');
-        var rootList = document.getElementById('root-list');
-        var chartArea = document.getElementById('chart-area');
-        var titleUsed={};
-
-        var initSideBar = function () {
-            var $mainList=$(sideBar).children('.main-list');
-            $mainList.find('.ml').click(function() {
-                var $subList=$(this).children('ul');
-                if ($subList.css('display')=='none'){
-                    $subList.fadeIn('middle');
-                }
-                else{
-                    $subList.fadeOut('fast');
-                }
-            });
-            $mainList.find('.sub-list').children('li').each(function(){
-                $(this).click(function(e){
-                    e.stopPropagation();
-                })
-            });
-        }();
     }
 };
 
@@ -404,7 +384,7 @@ DashBoard.VideoCons.prototype={
         this.videoPlay();
     },
     videoPlay:function(){
-        $f($(this.dom).attr('id'), "static/flowPlayer/flowPlayer-3.2.18.swf", {
+        $f($(this.dom).attr('id'), resource_url+"flowPlayer/flowPlayer-3.2.18.swf", {
             clip: {
                 url: this.url,
                 live: true,
@@ -412,10 +392,10 @@ DashBoard.VideoCons.prototype={
             },
             plugins: {
                 controls: {
-                    url: 'static/flowPlayer/flowplayer.controls-3.2.16.swf'
+                    url: resource_url+'flowPlayer/flowplayer.controls-3.2.16.swf'
                 },
                 influxis: {
-                    url: "static/flowPlayer/flowplayer.rtmp-3.2.12-dev.swf",
+                    url: resource_url+"flowPlayer/flowplayer.rtmp-3.2.12-dev.swf",
                     netConnectionUrl: 'rtmp://10.62.98.123/live'
                 }
             }
@@ -430,5 +410,4 @@ $(document).ready(function(){
     else{
         console.log('You have not defined any element on this page. Create function elements=function(){...} before document initialized');
     }
-    DashBoard.init();
 });
