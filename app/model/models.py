@@ -35,7 +35,7 @@ class Camera(db.Model):
         self.user_id = user_id
 
     def __repr__(self):
-        return '<Camera %r>' % self.id
+        return '<Camera %r>' % self.name
 
 
 class User(db.Model):
