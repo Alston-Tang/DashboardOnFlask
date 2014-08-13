@@ -7,8 +7,8 @@ from models import Camera
 #from camera import Camera
 class DBCamera():
 
-#    def create():
-#        db.create_all()
+    def create(shelf):
+        db.create_all()
 
 
 #    def __init__(self, camera):
@@ -34,34 +34,44 @@ class DBCamera():
         print("Deleted successfully!")
 
 
-#    def edit_camera(self,camera_id):
-        #参数
+    def edit_camera(self,camera_id,camera):
+#        c=Camera.query.get(camera_id)
+#        c.update(camera)
+        upSeg={camera}
+        db.session.query(Camera).filter_by(id=camera_id).update(upSeg, synchronize_session=False)
+
+#        for instance in db.session.query(Camera).filter_by(id=camera_id):
+#            db.session.update(instance.camera)
+        print "Update successfully!"
+#        c.update(c.camera_id == camera_id, values= {
+#                     c.camera_id: camera_id,c.name:name,c.location: location,c.latitude: latitude,c.longitude: longitude,c.ip: ip,c.stream_type: stream_type,c.encode_type:encode_type,}).execute()
+
 
     def get_allcameras(self):  #show cameras' list
         cameras = Camera.query.all()
-        print("The cameras' parameters are:")
-        print cameras
+        print("The cameras' parameters are:%s")%cameras
+
 
     def get_camera(self,camera_id):  #show one camera
         camera = Camera.query.get(camera_id)
-        print("The camera's parameters are:")
-        print camera
-
+        print("The camera's parameters are:%s")%camera
 
 if __name__ == "__main__":##测试
     dbc= DBCamera()
+#    dbc.create()
 #添加camera样例
-#    dbc.add_camera(Camera(name="test1", location="test1", ip="10.62.98.321",
-#                          stream_type="rtmp", encode_type="h264",source_url="rtmp://10.62.98.123/live/test", user_id=1))
+#    dbc.add_camera(Camera( name="test1", location="test1", ip="10.62.98.321",stream_type="rtmp", encode_type="h264",source_url="rtmp://10.62.98.123/live/test", user_id=1))
 
 #删除camera样例
-#    dbc.delete_camera(5)
+    dbc.delete_camera(2)
 
 #get所有camera信息
 #    dbc.get_allcameras()
 
 #get某个camera信息
-    dbc.get_camera(1)
+#    dbc.get_camera(1)
+
+#    dbc.edit_camera(2,Camera(name="new-edit", location="test", ip="10.62.98.123",stream_type="rtmp", encode_type="h264",source_url="rtmp://10.62.98.123/live/test", user_id=1))
 
 
 #    add_camera(Camera(name="test1", location="test1", ip="10.62.98.321",stream_type="rtmp", encode_type="h264",source_url="rtmp://10.62.98.123/live/test", user_id=1))
