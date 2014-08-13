@@ -35,7 +35,7 @@ class Camera(db.Model):
         self.user_id = user_id
 
     def __repr__(self):
-        return '<Camera %r>' % self.name
+        return '<Camera %r,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s>' % (self.id, self.name, self.location, self.latitude, self.longitude, self.ip, self.stream_type, self.encode_type, self.source_url, self.width, self.height, self.description, self.user_id)
 
 
 class User(db.Model):
