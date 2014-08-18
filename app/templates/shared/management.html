@@ -10,7 +10,8 @@
 {% block content %}
 {% endblock %}
 {% block extra_js %}
-    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/manage/camera.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='javascripts/manage/tmpl.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename="javascripts/manage/managePanel.js") }}"></script>
+    {% block page_js %}
+    {% endblock %}
 {% endblock %}

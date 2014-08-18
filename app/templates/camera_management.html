@@ -57,11 +57,11 @@
                 </div>
             </div>
             <div class="row" id="camera-wall">
-                <div class="col-lg-2 col-sm-4 col-md-3">
+                <div class="col-md-3">
                     <div class="thumbnail">
-                        <object id="camera1">
-
-                        </object>
+                        <div class="embed-responsive embed-responsive-4by3">
+                            <object id="camera1" class="embed-responsive-item"></object>
+                        </div>
                         <div class="caption">
                             <h3>Camera 1</h3>
                             <p>8F, Block D, Tsinghua Science Park </p>
@@ -75,12 +75,16 @@
             </div>
         </div>
     </div>
-
+{% endblock %}
+{% block page_js %}
+    <script type="text/javascript" src="{{ url_for('static', filename='javascripts/manage/camera.js') }}"></script>
     <!-- blue-tmpl components for camera manage panel-->
     {% raw %}
     <script type="text/blueimp-tmpl" id="camera-panel">
     <div class="thumbnail">
-        <object id="{%#o.id%}_camera"></object>
+        <div class="embed-responsive embed-responsive-4by3">
+            <object class="embed-responsive-item"id="{%#o.id%}_camera"></object>
+        </div>
         <div class="caption">
             <h3>{%=o.name%}</h3>
             <p>{%=o.description%}</p>

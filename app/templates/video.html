@@ -2,14 +2,56 @@
 {% block content %}
 <!-- Content Begin -->
     <div class="row" id="chart-area">
-        <div class="col-md-6">
-            <div id="monitor1" style="height:480px;margin:0 auto;text-align:center ">
+        <div class="col-md-4 col-sm-6 wall">
+            <div class="embed-responsive embed-responsive-4by3">
+                <object id="monitor1" class="embed-responsive-item">
+                </object>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6 wall">
+            <div class="embed-responsive embed-responsive-4by3">
+                <object id="monitor2" class="embed-responsive-item">
+                </object>
+            </div>
+        </div>
+        <div class="col-md-4 col-sm-6 wall">
+            <div class="embed-responsive embed-responsive-4by3">
+                <object id="monitor3" class="embed-responsive-item">
+                </object>
             </div>
         </div>
     </div>
     <script>
         var elements=function() {
-            DashBoard.Video(document.getElementById('monitor1'), 'test', 'd').enableUpdate();
+            DashBoard.Video(document.getElementById('monitor1'), 'test1', 'd').enableUpdate();
+            $f('monitor2', resource_url+"flowPlayer/flowPlayer-3.2.18.swf", {
+            clip: {
+                autoPlay: true,
+                onBeforeFinish: function(){
+                    return false;
+                },
+                url: '/static/resource/front_desk.flv'
+            },
+            plugins: {
+                controls: {
+                    url: resource_url+'flowPlayer/flowplayer.controls-3.2.16.swf'
+                }
+            }
+            });
+            $f('monitor3', resource_url+"flowPlayer/flowPlayer-3.2.18.swf", {
+            clip: {
+                autoPlay: true,
+                onBeforeFinish: function(){
+                    return false;
+                },
+                url: '/static/resource/bjcf_road.flv'
+            },
+            plugins: {
+                controls: {
+                    url: resource_url+'flowPlayer/flowplayer.controls-3.2.16.swf'
+                }
+            }
+            });
         }
     </script>
 {% endblock %}

@@ -48,5 +48,56 @@ var thmTools= {
             }
         }
         return rtVal;
+    },
+    //Check whether success. If so, return parsed data, else throw error
+    checkSuccess:function(data){
+        data=JSON.parse(data);
+        if(!data.success){
+            var error=data.error?data.error:"Unknown error";
+            throw "Server:"+error;
+        }
+        return data.data;
+    },
+    parseStringToDom:function(str){
+        var rt=[];
+        var temp=document.createElement('div');
+        $(temp).html(str);
+        temp=$(temp).children();
+        for(var i=0; i<temp.length; i++){
+            rt.push(temp[i]);
+        }
+        return rt;
+    },
+    appendDomList:function(container,doms){
+        for(var i=0; i<doms.length; i++){
+            container.appendChild(doms[i]);
+        }
+    },
+    twoDigit:function(digit){
+        if (isNaN(digit)) digit=parseInt(digit);
+        if(digit>=10){
+            return digit.toString();
+        }
+        else{
+            return '0'+digit.toString();
+        }
+    },
+    threeDigit:function(digit){
+        if (isNaN(digit)) digit=parseInt(digit);
+        if(digit>=100){
+            return digit.toString();
+        }
+        else{
+            return '0'+thmTools.twoDigit(digit);
+        }
+    },
+    truncLastZero:function(str){
+        for(var i=2; i>=0; i--){
+            if (str[i]!='0'){
+                break;
+            }
+            str=str.substring(0,i);
+        }
+        return str;
     }
 };

@@ -9,6 +9,7 @@ DashBoard= {
     DrawList:[],
     TrackList:[],
     VideoList:[],
+    AnList:[],
     idPool:{},
     resId:function(id){
         if (this.idPool[id]){
@@ -42,14 +43,164 @@ DashBoard= {
             throw "A html node and a unique id is required.";
         }
         if (!url) {
-            throw "url is required"
+            throw "url is required";
         }
         this.resId(id);
         var c = new DashBoard.VideoCons(dom, url, id, opt);
         this.VideoList.push(c);
         return c;
+    },
+    AnomalyDetection:function(dom,url,id,opt){
+        if(!dom ||!id){
+            throw "A html node and a unique id is required";
+        }
+        if(!url){
+            throw "url is required";
+        }
+        this.resId(id);
+        var c= new DashBoard.AnCons(dom.url,id,opt);
+        this.AnList.push(c);
+        return c;
     }
 };
+
+DashBoard.basePrototype=function(thisClass){
+    if (typeof (thisClass.prototype)!='object'){
+        thisClass.prototype={};
+    }
+    thisClass.prototype.url=function(url){
+        if(url==undefined){
+            return this.url;
+        }
+        else{
+            this.url=url;
+            return this;
+        }
+    };
+    thisClass.prototype.interval=function(interval){
+        if(interval==undefined){
+            return interval;
+        }
+        else{
+            this.interval=interval;
+            return this;
+        }
+    };
+};
+
+DashBoard.AnCons=function(dom,url,id,opt){
+    if(!dom||!url||!id){
+        throw "A html node and video url is required.";
+    }
+    this.dom=dom;
+    this.id=id;
+    this.url=url;
+    //Image displayed on page
+    this.display={};
+};
+DashBoard.AnCons.prototype={
+    query:function(start,end){
+        $.ajax(this.url,{
+            type:'GET',
+            data:{id:this.id,start:start,end:end},
+            success:this._querySuccess,
+            error:this._queryError
+        })
+    },
+    // Return JSON type {success:exists if no error,
+    //                   error:error information,
+    //                   content:[{time: time of Pic,
+    //                             img: picture content,
+    //                             tsVideo: relative time in a video
+    //                             tsCapture: real time
+    //                             sourceId: id of source
+    //                             fingerPrint: = =
+    //                             frameId: id of this frame
+    //                             detect:[{information of detection},{},....]},
+    //                            {...},
+    //                           ]
+    //                  }
+    // detect is in time order
+    _querySuccess:function(data){
+        if(!data.success){
+            //Error handle
+        }
+        else {
+            var images=[];
+            //Load image
+            for (var i=0; i<data.content.length; i++){
+                images[i]=this._createImg(data.content[i].img);
+            }
+            for (i = 0; i < data.content.length; i++) {
+                var canvas = this._createCanvas(images[i]);
+                var ctx = canvas.getContext('2d');
+                for (var j = 0; j < data.content[i].detect.length; j++) {
+                    this._drawA(canvas, ctx, data.content[i].detect[j]);
+                }
+                this._insertA(data.content[i].frameId,canvas);
+            }
+        }
+    },
+    // Transfer response image to a valid img node
+    _createImg:function(img){
+        var imgDom;
+        imgDom = document.createElement('img');
+        //TODO transfer image to data to a valid img node
+        return imgDom
+    },
+    _createCanvas:function(imgDom){
+        var cur=this;
+        if (!imgDom.complete){
+            //If image is not loaded yet, wait for 1 second and retry
+            setTimeout('cur._createCanvas.call(cur,imgDom);',1000);
+            return;
+        }
+        //Else draw img to canvas
+        var canvasDom=document.createElement('canvas');
+        canvasDom.width=imgDom.naturalWidth;
+        canvasDom.height=imgDom.naturalHeight;
+        var ctx=canvasDom.getContext('2d');
+        ctx.drawImage(imgDom,0,0,canvasDom.width,canvasDom.height);
+        return canvasDom;
+    },
+    _queryError:function(data){
+        //Error handle
+    },
+    _drawA:function(canvasDom,ctx,detection){
+        var shape=detection.shape;
+        if(!this._shape[shape]){
+            // An unsupported shape
+            Console.log('Can not draw shape "'+shape+'"');
+            return;
+        }
+        this._shape[shape](ctx,detection.x,detection.y,detection.w,detection.h);
+    },
+    _shape:{
+        rectangle:function(ctx,x,y,w,h){
+            ctx.strokeStyle='red';
+            ctx.lineWidth=2;
+            ctx.strokeRect(x,y,w,h);
+        }
+    },
+    _insertA:function(frameId,canvasDom){
+        // Same frame already displayed
+        if(this.display[frameId.toString()]){
+            //TODO replace dom?
+        }
+        // Not displayed yet
+        else{
+            this.dom.insertBefore(canvasDom,this.dom.firstChild);
+            this.display[frameId.toString()]=canvasDom;
+        }
+    },
+    clear:function(start,end){
+        //TODO clear a range of detections
+    },
+    clearAll:function(){
+        this.dom.html();
+    }
+};
+DashBoard.basePrototype(DashBoard.AnCons);
 
 DashBoard.VideoCons=function(dom,url,id,opt){
     if(!dom||!url||!id){
@@ -141,50 +292,9 @@ DashBoard.DataRange=function(begin,end,data,opt){
             }
         }
     }
-};
+}
 
-DashBoard.DataRange.prototye={
-    find:function(date){
-        var rv={};
-        var left= 0, right=this.con.length- 1, mid=Math.floor((left+right)/2);
-        while(left<right){
-            if(this.con[mid].date<date){
-                left=mid+1;
-            }
-            else if(this.con[mid].date>date){
-                right=mid-1;
-            }
-            else{
-                rv.value=this.con[mid].value;
-                rv.next=mid+1;
-                return rv;
-            }
-            mid=Math.floor((left+right)/2);
-        }
-        if (this.con[left].date==date){
-            rv.value=this.con[mid].value;
-            rv.next=left+1;
-        }
-        else{
-            rv.value=null;
-            if (this.con[left].date<date){
-                rv.next=left+1;
-            }
-            else{
-                rv.next=left;
-            }
-        }
-        return rv;
-    },
-    insert:function(date,content){
-        if(!date.constructor || date.constructor!=Date) {
-            date=new Date(date);
-            var rs=this.find(date);
-            var pos=rs.next-1;
-            this.con.splice(pos,0,{date:content});
-        }
-    }
-};
+//Track
 DashBoard.TrackPicCons.prototype={
     point:function(top,left,opt){
         var point=document.createElementNS("http://www.w3.org/2000/svg",'circle');
@@ -228,25 +338,7 @@ DashBoard.TrackPicCons.prototype={
             $(this.svg).children().remove();
         }
     },
-    url:function(url){
-        if(!url) return this.urlAttr;
-        this.urlAttr=url;
-        return this;
-    },
-    interval:function(i){
-        if(!i) return this.intervalAttr;
-        this.intervalAttr=i;
-        return this;
-    },
     //Data parse
-    groupInsert:function(data){
-        for(var i=0; i<data.length; i++){
-            var value={};
-            var date=new Date(data[i][5]*1000);
-            value.type=data[i][0];
-
-        }
-    },
     parseType:function(type,data){
         var rv={};
         switch (type){
@@ -336,23 +428,10 @@ DashBoard.TrackPicCons.prototype={
         })
     }
 };
+DashBoard.basePrototype(DashBoard.TrackPicCons);
 
-
+//Chart
 DashBoard.ChartCons.prototype={
-    url:function(url){
-        if(!url) return this.urlAttr;
-        this.urlAttr=url;
-        return this;
-    },
-    title:function(title){
-        $(this.titleDom).html('<h2>'+title+'</h2>');
-        return this;
-    },
-    interval:function(i){
-        if(!i) return this.intervalAttr;
-        this.intervalAttr=i;
-        return this;
-    },
     enableUpdate:function(){
         var cur=this;
         if(!this.urlAttr) return false;
@@ -378,7 +457,9 @@ DashBoard.ChartCons.prototype={
         $(this.contentDom).html("");
     }
 };
+DashBoard.basePrototype(DashBoard.ChartCons);
 
+// Video
 DashBoard.VideoCons.prototype={
     enableUpdate:function(){
         this.videoPlay();
@@ -402,6 +483,7 @@ DashBoard.VideoCons.prototype={
         });
     }
 };
+DashBoard.basePrototype(DashBoard.VideoCons);
 
 $(document).ready(function(){
     if(typeof (elements)=='function'){

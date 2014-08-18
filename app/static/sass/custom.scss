@@ -6,6 +6,11 @@ $emc-grey: #DDDDDD;
 
 $side-bar-width: 240px;
 
+
+.wall{
+  padding-bottom: 10px;
+}
+
 //Handle Layer
 html {
   height: 100%;
@@ -54,6 +59,7 @@ html {
   box-shadow: 5px 5px 5px;
   position: fixed;
   top: 0;
+  overflow-y: auto;
   li{
     list-style: none;
     cursor: pointer;

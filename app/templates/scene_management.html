@@ -1,0 +1,162 @@
+{% extends 'shared/management.html' %}
+{% block side_bar %}
+    <div id="side-bar">
+        <h3 style="position: absolute; left: 0; right: 0; text-align: center">Scenes</h3>
+        <ul class="main-list">
+            <li id="side-add-scene" class="ml disable-sub">
+                 <span class="ml-content">
+                     <i class="fa fa-plus" style="color:green"></i>
+                     Add a scene
+                 </span>
+                <hr class="hr-top">
+                <hr class="hr-bot">
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+{% block content %}
+    <!-- Content Begin -->
+    <div id="chart-area">
+        <div id="scene-setting" class="ext-panel">
+        </div>
+        <div id="scene-area">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- Nav tabs -->
+                    <ul class="nav nav-tabs" role="tablist" id="scene-list">
+                        <li class="active"><a href="#home" role="tab" data-toggle="tab">Home</a></li>
+                        <li><a href="#cameras" role="tab" data-toggle="tab">Camera</a></li>
+                        <li><a href="#apps" role="tab" data-toggle="tab">Application</a></li>
+                    </ul>
+                    <!-- Tab panes -->
+                    <div class="tab-content" id="scene-content">
+                        <div class="tab-pane active" id="home"></div>
+                        <div class="tab-pane" id="cameras"></div>
+                        <div class="tab-pane" id="apps"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block page_js %}
+    <script type="text/javascript" src="{{ url_for('static',filename='javascripts/manage/scene.js') }}"></script>
+    {% raw %}
+    <script type="text/blueimp-tmpl" id="home_panel">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>{%=o.name%}</h2>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-md-12">
+                <h3>{%=o.location%}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p>{%=o.description%}</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="list-group">
+                    <li class="list-group-item">
+                        <span class="badge">{%=o.appNum%}</span>
+                        Applications
+                    </li>
+                    <li class="list-group-item">
+                        <span class="badge">{%=o.cameraNum%}</span>
+                        Cameras
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </script>
+    <script type="text/blueimp-tmpl" id="camera_panel">
+        <div class="row" style="margin:20px">
+            <div class="col-md-2">
+                <button class="btn btn-success btn-block add-camera">Add cameras</button>
+            </div>
+        </div>
+        <div class="row" id="camera-wall">
+        </div>
+    </script>
+    <script type="text/blueimp-tmpl" id="camera_item">
+    <div class="col-md-3">
+        <div class="thumbnail">
+            <div class="embed-responsive embed-responsive-4by3">
+                <object class="embed-responsive-item"></object>
+            </div>
+            <div class="caption">
+                <h3>{%=o.name%}</h3>
+                <p>{%=o.location%}</p>
+                <p>
+                    <a href="#" class="btn btn-danger btn-block remove-camera" role="button">Remove from this scene</a>
+                </p>
+            </div>
+        </div>
+    </div>
+    </script>
+    <script type="text/blueimp-tmpl" id="app_panel">
+        <div class="row" style="margin:20px">
+            <div class="col-md-2">
+                <button class="btn btn-success btn-block add-app">Add application</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12" id="app-wall">
+
+            </div>
+        </div>
+    </script>
+    <script type="text/blueimp-tmpl" id="app_item">
+    <div class="thumbnail">
+        <div class="caption">
+            <h3>{%=o%}</h3>
+            <p>Descriptiont of this application</p>
+            <p><a href="#" class="btn btn-primary" role="button">Edit</a> <a href="#" class="btn btn-danger" role="button">Remove</a></p>
+        </div>
+    </div>
+    </script>
+    <script type="text/blueimp-tmpl" id="side_bar_tmpl">
+    <li class="ml disable-sub">
+        <span class="ml-content">
+            <i class="fa fa-image" style="color:yellow"></i>
+            {%=o.name%}
+        </span>
+        <hr class="hr-top">
+        <hr class="hr-bot">
+    </li>
+    </script>
+    <script type="text/blueimp-tmpl" id="add-scene">
+    <div class="row">
+        <div class="col-md-4">
+            <form role="form" id="config-form">
+                <input type="hidden" name="id">
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label>Name</label>
+                        <input type="text" class="form-control" name="name">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label>Location</label>
+                        <input type="text" class="form-control" name="location">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-12">
+                        <label >Description</label>
+                        <textarea rows="3" class="form-control" name="desc"></textarea>
+                    </div>
+                </div>
+                <button class="btn btn-default" id="save-config">Save</button>
+            </form>
+        </div>
+    </div>
+    </script>
+    {% endraw %}
+{% endblock %}

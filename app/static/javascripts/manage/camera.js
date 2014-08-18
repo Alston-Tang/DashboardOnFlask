@@ -186,9 +186,6 @@ var CameraManage=function(opt){
     $(document).ajaxComplete(function(){
         cur.loadingPanel.hide();
     });
-    $(document).ajaxError(function(){
-        cur.loadingPanel.hide();
-    });
     //Bind button listener
     $('#side-add-camera').click(function(){
         cur.addA();
@@ -245,7 +242,7 @@ CameraManage.prototype.appendA=function(camera){
     var dom=document.createElement('div');
     dom.bindCamera=camera;
     //Render html
-    $(dom).addClass('col-lg-2 col-sm-4 col-md-3').
+    $(dom).addClass('col-md-3').
            html(tmpl('camera-panel',camera.config));
     //Set setting handler
     $(dom).find('.btn-primary').click(function(){
