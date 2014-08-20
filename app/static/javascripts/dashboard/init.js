@@ -58,7 +58,7 @@ DashBoard= {
             throw "url is required";
         }
         this.resId(id);
-        var c= new DashBoard.AnCons(dom.url,id,opt);
+        var c= new DashBoard.AnCons(dom,url,id,opt);
         this.AnList.push(c);
         return c;
     }
@@ -68,7 +68,7 @@ DashBoard.basePrototype=function(thisClass){
     if (typeof (thisClass.prototype)!='object'){
         thisClass.prototype={};
     }
-    thisClass.prototype.url=function(url){
+    thisClass.prototype.urlIs=function(url){
         if(url==undefined){
             return this.url;
         }
@@ -77,7 +77,7 @@ DashBoard.basePrototype=function(thisClass){
             return this;
         }
     };
-    thisClass.prototype.interval=function(interval){
+    thisClass.prototype.intervalIs=function(interval){
         if(interval==undefined){
             return interval;
         }
@@ -95,49 +95,70 @@ DashBoard.AnCons=function(dom,url,id,opt){
     this.dom=dom;
     this.id=id;
     this.url=url;
+    //Detect binding video
+    this.bindVideo=opt.bindVideo?opt.bindVideo:null;
     //Image displayed on page
     this.display={};
+    //Image to be displayed
+    this.loadingList={};
 };
 DashBoard.AnCons.prototype={
     query:function(start,end){
+        var cur=this;
         $.ajax(this.url,{
             type:'GET',
             data:{id:this.id,start:start,end:end},
-            success:this._querySuccess,
+            crossDomain:true,
+            success:function(data){
+                cur._querySuccess.call(cur,data)
+            },
             error:this._queryError
         })
     },
-    // Return JSON type {success:exists if no error,
-    //                   error:error information,
-    //                   content:[{time: time of Pic,
-    //                             img: picture content,
-    //                             tsVideo: relative time in a video
-    //                             tsCapture: real time
-    //                             sourceId: id of source
-    //                             fingerPrint: = =
-    //                             frameId: id of this frame
-    //                             detect:[{information of detection},{},....]},
-    //                            {...},
-    //                           ]
-    //                  }
-    // detect is in time order
+    // Return JSON format {success:exists if no error,
+    //                     error:error information,
+    //                     content:[{time: time of Pic,
+    //                               img: picture content,
+    //                               tsVideo: relative time in a video
+    //                               tsCapture: real time
+    //                               sourceId: id of source
+    //                               fingerPrint: = =
+    //                               frameId: id of this frame
+    //                               detect:[{information of detection},{},....]},
+    //                              {...},
+    //                             ]
+    //                    }
+    //                    detect is in time order
     _querySuccess:function(data){
+        data=JSON.parse(data);
         if(!data.success){
             //Error handle
         }
         else {
             var images=[];
-            //Load image
-            for (var i=0; i<data.content.length; i++){
-                images[i]=this._createImg(data.content[i].img);
+            //Insert to loading list
+            for(var i=0; i<data.content.length; i++){
+                data.content[i].img=this._createImg(data.content[i].img);
+                this.loadingList[data.content[i].frameid.toString()]=data.content[i];
             }
-            for (i = 0; i < data.content.length; i++) {
-                var canvas = this._createCanvas(images[i]);
-                var ctx = canvas.getContext('2d');
-                for (var j = 0; j < data.content[i].detect.length; j++) {
-                    this._drawA(canvas, ctx, data.content[i].detect[j]);
+        }
+    },
+    //Display loaded picture in loading list
+    displayNow:function(){
+        for(var pic in this.loadingList){
+            if(this.loadingList.hasOwnProperty(pic)){
+                //Picture has loaded
+                if(this.loadingList[pic].img.complete){
+                    var inf=this.loadingList[pic];
+                    //Draw
+                    var canvas = this._createCanvas(inf.img);
+                    var ctx = canvas.getContext('2d');
+                    for (var j = 0; j < inf.detect.length; j++) {
+                        this._drawA(canvas, ctx, inf.detect[j]);
+                    }
+                    this._insertA(inf.frameid,this._assembleContainer(canvas));
+                    delete this.loadingList[pic];
                 }
-                this._insertA(data.content[i].frameId,canvas);
             }
         }
     },
@@ -146,6 +167,10 @@ DashBoard.AnCons.prototype={
         var imgDom;
         imgDom = document.createElement('img');
         //TODO transfer image to data to a valid img node
+        // Demo code
+        $(imgDom).attr('src','/static/resource/demo_pic.png');
+        $('#img-loader').append(imgDom);
+        //end
         return imgDom
     },
     _createCanvas:function(imgDom){
@@ -167,10 +192,10 @@ DashBoard.AnCons.prototype={
         //Error handle
     },
     _drawA:function(canvasDom,ctx,detection){
-        var shape=detection.shape;
+        var shape=detection.shape.toLowerCase();
         if(!this._shape[shape]){
             // An unsupported shape
-            Console.log('Can not draw shape "'+shape+'"');
+            console.log('Can not draw shape "'+shape+'"');
             return;
         }
         this._shape[shape](ctx,detection.x,detection.y,detection.w,detection.h);
@@ -181,6 +206,12 @@ DashBoard.AnCons.prototype={
             ctx.lineWidth=2;
             ctx.strokeRect(x,y,w,h);
         }
+    },
+    _assembleContainer:function(canvasDom){
+        var div=document.createElement('div');
+        $(div).attr({'class':'col-md-3'}).css({'margin-bottom':'5px'}).append(canvasDom);
+        $(canvasDom).addClass('img-responsive');
+        return div;
     },
     _insertA:function(frameId,canvasDom){
         // Same frame already displayed
@@ -198,6 +229,22 @@ DashBoard.AnCons.prototype={
     },
     clearAll:function(){
         this.dom.html();
+    },
+    enableUpdate:function(){
+        var cur=this;
+        setInterval(function(){cur._queryControl.call(cur)},this.interval);
+        setInterval(function(){cur.displayNow.call(cur)},this.interval);
+    },
+    _queryControl:function(){
+        //If is a video file
+        var time=this.bindVideo?this.bindVideo.getTime()*1000:Date.getTime();
+        var start=time-5000<0?0:time-5000;
+        var end=time;
+        if(isNaN(start) || isNaN(end)){
+            //Possible reason: video haven't been loaded yet
+            return;
+        }
+        this.query(start,end);
     }
 };
 DashBoard.basePrototype(DashBoard.AnCons);
@@ -210,6 +257,15 @@ DashBoard.VideoCons=function(dom,url,id,opt){
     this.id=id;
     this.url=url;
     opt=opt?opt:{};
+    if(opt.live){
+        this.live=true;
+    }
+    //check dom id exists
+    if (!$(this.dom).attr('id')){
+        $(this.dom).attr('id',this.id);
+    }
+    //create player
+    this.player=this.live?this._livePlayer():this._videoPlayer();
 };
 
 DashBoard.ChartCons=function(dom,type,id,opt){
@@ -292,7 +348,7 @@ DashBoard.DataRange=function(begin,end,data,opt){
             }
         }
     }
-}
+};
 
 //Track
 DashBoard.TrackPicCons.prototype={
@@ -462,11 +518,12 @@ DashBoard.basePrototype(DashBoard.ChartCons);
 // Video
 DashBoard.VideoCons.prototype={
     enableUpdate:function(){
-        this.videoPlay();
+        this.player.play();
     },
-    videoPlay:function(){
-        $f($(this.dom).attr('id'), resource_url+"flowPlayer/flowPlayer-3.2.18.swf", {
+    _livePlayer:function(){
+        return $f($(this.dom).attr('id'), resource_url+"flowPlayer/flowplayer-3.2.18.swf", {
             clip: {
+                autoPlay:false,
                 url: this.url,
                 live: true,
                 provider: 'influxis'
@@ -481,6 +538,22 @@ DashBoard.VideoCons.prototype={
                 }
             }
         });
+    },
+    _videoPlayer:function(){
+        return $f($(this.dom).attr('id'), resource_url+"flowPlayer/flowplayer-3.2.18.swf", {
+            clip: {
+                autoPlay: false,
+                url: this.url
+            },
+            plugins: {
+                controls: {
+                    url: resource_url+'flowPlayer/flowplayer.controls-3.2.16.swf'
+                }
+            }
+        });
+    },
+    getTime:function(){
+        return this.player.getTime();
     }
 };
 DashBoard.basePrototype(DashBoard.VideoCons);

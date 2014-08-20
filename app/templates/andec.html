@@ -1,0 +1,34 @@
+{% extends 'shared/dashboard.html' %}
+{% block content %}
+<!-- Content Begin -->
+    <div id="chart-area">
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <div class="embed-responsive embed-responsive-4by3">
+                    <object id="monitor" class="embed-responsive-item">
+                    </object>
+                </div>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+        <hr>
+        <div id="gallery" style="position:relative; overflow-x: auto;float:left; min-width: 100%; height: 400px">
+
+        </div>
+        <div style="display: none" id="img-loader">
+
+        </div>
+    </div>
+    <script>
+        var elements=function(){
+            var video=DashBoard.Video(document.getElementById('monitor'),"/static/resource/front_desk.flv",'monitor1');
+            test=DashBoard.AnomalyDetection(document.getElementById('gallery'),'http://10.62.98.212:5000/detections','front_desk',{
+                bindVideo:video
+            });
+            test.intervalIs(3000);
+            test.enableUpdate();
+
+        }
+    </script>
+{% endblock %}

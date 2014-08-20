@@ -46,7 +46,23 @@ Scene.prototype={
         })
     },
     remove:function(){
-
+        var cur=this;
+        if(isNaN(this.config.id)){
+            throw "Invalid id, can't remove camera"
+        }
+        $.ajax(this.manage.serverUrl,{
+            type:"DELETE",
+            data:{id:cur.config.id},
+            success:function(data){
+                data=JSON.parse(data);
+                if(data.success){
+                    cur.manage.success.removeA.call(cur.manage,cur);
+                }
+                else{
+                    throw "Server:"+data.error;
+                }
+            }
+        })
     },
     addCamera:function(){
 
@@ -111,8 +127,8 @@ SceneManage.prototype={
         data=thmTools.serializeToObj(data);
         new Scene(this,data).add();
     },
-    removeA:function(){
-
+    removeA:function(scene){
+        scene.remove();
     },
     addACamera:function(){
 
@@ -130,6 +146,17 @@ SceneManage.prototype={
 
 SceneManage.prototype.UI={
     loadA:function(scene){
+        var cur=this;
+        var $homePanel=$('#home');
+        var $camerasPanel=$('#cameras');
+        var $appPanel=$('#apps');
+        // If no scene exists
+        if(!scene){
+            $homePanel.html("");
+            $camerasPanel.html("");
+            $appPanel.html("");
+            return;
+        }
         // This scene is displayed on panel
         this.display=scene;
         var config=scene.config;
@@ -137,9 +164,14 @@ SceneManage.prototype.UI={
         config.cameraNum=Object.keys(scene.cameras).length;
         config.appNum=scene.apps.length;
         //Render panel
-        $('#home').html(tmpl('home_panel',config));
-        $('#cameras').html(tmpl('camera_panel',config));
-        $('#apps').html(tmpl('app_panel',config));
+        var homePanel=$homePanel.html(tmpl('home_panel',config));
+        var camerasPanel=$camerasPanel.html(tmpl('camera_panel',config));
+        var appPanel=$appPanel.html(tmpl('app_panel',config));
+        //Set button listener
+        var deleteButton=homePanel.find('.delete-scene')[0];
+        $(deleteButton).click(function(){
+            cur.removeA(cur.display);
+        });
         //Render camera panel content
         var content="";
         for (var camera in scene.cameras){
@@ -167,11 +199,16 @@ SceneManage.prototype.UI={
         scene.dom.sideBar.scene=scene;
         // Set scene switch listener
         $(scene.dom.sideBar).click(function(){
-            this.scene.manage.UI.loadA(this.scene);
+            this.scene.manage.UI.loadA.call(this.scene.manage,this.scene);
         });
+        // Display new scene
+        scene.manage.UI.loadA.call(this,scene);
     },
-    deleteA:function(){
-
+    deleteA:function(scene){
+        //Display another scene
+        var temp=this.UI.loadA(this.scenelist[Object.keys(this.scenelist)[0]]);
+        //Delete side bar
+        $(scene.dom.sideBar).remove();
     },
     appendACamera:function(){
 
@@ -196,24 +233,25 @@ SceneManage.prototype.success={
         //Load side bar
         for (var scene in this.scenelist){
             if (this.scenelist.hasOwnProperty(scene)){
-                this.UI.appendA(this.scenelist[scene]);
+                this.UI.appendA.call(this,this.scenelist[scene]);
             }
         }
         //Render UI
         for (scene in this.scenelist){
             if (this.scenelist.hasOwnProperty(scene)){
-                this.UI.loadA(this.scenelist[scene]);
+                this.UI.loadA.call(this,this.scenelist[scene]);
                 break;
             }
         }
     },
     addA:function(scene){
         this.scenelist[scene.config.id.toString()]=scene;
-        this.UI.appendA(scene);
+        this.UI.appendA.call(this,scene);
         this.settingPanel.hide();
     },
-    removeA:function(){
-
+    removeA:function(scene){
+        delete this.scenelist[scene.config.id.toString()];
+        this.UI.deleteA.call(this,scene);
     },
     addACamera:function(){
 

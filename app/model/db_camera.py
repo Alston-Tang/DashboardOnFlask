@@ -24,7 +24,7 @@ class DBCamera():
         db.session.add(camera)
         db.session.flush()
         db.session.commit()
-        print "Added successfully!"
+        print ("Added successfully!")
 
     def delete_camera(self,camera_id):
         c = Camera.query.get(camera_id)
@@ -42,7 +42,7 @@ class DBCamera():
 
 #        for instance in db.session.query(Camera).filter_by(id=camera_id):
 #            db.session.update(instance.camera)
-        print "Update successfully!"
+        print ("Update successfully!")
 #        c.update(c.camera_id == camera_id, values= {
 #                     c.camera_id: camera_id,c.name:name,c.location: location,c.latitude: latitude,c.longitude: longitude,c.ip: ip,c.stream_type: stream_type,c.encode_type:encode_type,}).execute()
 

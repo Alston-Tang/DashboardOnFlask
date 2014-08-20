@@ -12,7 +12,7 @@ class DBScene():
         db.session.add(scene)
         db.session.flush()
         db.session.commit()
-        print "Added successfully!"
+        print ("Added successfully!")
 
     def delete_scene(self,scene_id):
         s = Scene.query.get(scene_id)

@@ -23,35 +23,8 @@
     </div>
     <script>
         var elements=function() {
-            DashBoard.Video(document.getElementById('monitor1'), 'test1', 'd').enableUpdate();
-            $f('monitor2', resource_url+"flowPlayer/flowPlayer-3.2.18.swf", {
-            clip: {
-                autoPlay: true,
-                onBeforeFinish: function(){
-                    return false;
-                },
-                url: '/static/resource/front_desk.flv'
-            },
-            plugins: {
-                controls: {
-                    url: resource_url+'flowPlayer/flowplayer.controls-3.2.16.swf'
-                }
-            }
-            });
-            $f('monitor3', resource_url+"flowPlayer/flowPlayer-3.2.18.swf", {
-            clip: {
-                autoPlay: true,
-                onBeforeFinish: function(){
-                    return false;
-                },
-                url: '/static/resource/bjcf_road.flv'
-            },
-            plugins: {
-                controls: {
-                    url: resource_url+'flowPlayer/flowplayer.controls-3.2.16.swf'
-                }
-            }
-            });
+            DashBoard.Video(document.getElementById('monitor1'), 'test1', 'liveVideo',{live:true}).enableUpdate();
+            DashBoard.Video(document.getElementById('monitor2'), '/static/resource/bjcf_road.flv','file1').enableUpdate();
         }
     </script>
 {% endblock %}

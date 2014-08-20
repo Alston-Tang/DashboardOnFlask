@@ -39,7 +39,7 @@ def chart_request_handle(chart_id):
 
 @app.route('/test', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def test():
-    print request.values
+    print(request.values)
     if request.method == 'POST':
         return json.dumps({'success': True, 'id': 1})
     if request.method == 'DELETE':
@@ -50,7 +50,7 @@ def test():
 
 @app.route('/scene', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def scene_handle():
-    print request.values
+    print(request.values)
     if request.method == 'GET':
         return json.dumps({'success': True, 'data': [{'id': 1, 'location': 'Beijing',
                            'name': 'Test Scene', 'desc': 'Hello',
@@ -59,6 +59,8 @@ def scene_handle():
                            'apps': ['camera_monitoring', 'anomaly_detection', 'trajectory_analytics']}]})
     if request.method == 'POST':
         return json.dumps({'success': True, 'id': 2})
+    if request.method == 'DELETE':
+        return json.dumps({'success': True})
     return 'hello'
 
 
@@ -74,5 +76,5 @@ def scene_application_handle():
 
 @app.route('/rest', methods=['GET','POST'])
 def rest():
-    print request.values
+    print(request.values)
     return 'hello'
